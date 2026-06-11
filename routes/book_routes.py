@@ -50,11 +50,13 @@ def change_book_details(id:int,data:Update):
 def get_report_summary():
     num_of_book = book.count_total_books()
     num_of_book_avail = book.count_available_books()
+    num_of_book_non_avail=book.count_borrowed_books()
     if not num_of_book:
         raise HTTPException(status_code=404, detail=f"Error the book with id {id} was not found")
     return {
         "total books": num_of_book,
-        "total available books": num_of_book_avail
+        "total available books": num_of_book_avail,
+        "total borrowed books": num_of_book_non_avail
     }
 
 if __name__=="__main__":

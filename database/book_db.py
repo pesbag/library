@@ -73,3 +73,12 @@ class BookDb:
 
     def set_available(self,id,val,member_id):
         pass
+    def count_borrowed_books(self):
+        conn=get_connection()
+        cursor=conn.cursor()
+        cursor.execute("SELECT COUNT(*) AS total FROM books WHERE is_available=%s",(False,))
+        total=cursor.fetchone()[0]
+        cursor.close()
+        conn.close()
+        return total
+
