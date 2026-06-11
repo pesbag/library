@@ -38,3 +38,38 @@ class BookDb:
         cursor.close()
         conn.close()
         return book
+
+    def count_total_books(self):
+        conn=get_connection()
+        cursor=conn.cursor(dictionary=True)
+        cursor.execute("SELECT COUNT(*) AS total_books FROM books")
+        total=cursor.fetchone()["total_books"]
+        cursor.close()
+        conn.close()
+        return total
+
+    def count_available_books(self):
+        conn=get_connection()
+        cursor=conn.cursor(dictionary=True)
+        cursor.execute("SELECT COUNT(*) AS total FROM books WHERE is_available=%s",(True,))
+        total=cursor.fetchone()["total"]
+        cursor.close()
+        conn.close()
+        return total
+
+    def update_book(self,id:int,data:dict):
+        conn=get_connection()
+        cursor=conn.cursor()
+        set_part=[f"{key}=%s" for key in data.keys()]
+        set_clause=",".join(set_part)
+        sql=f"UPDATE books SET {set_clause} WHERE id=%s"
+        values=list(data.values())+[id]
+        cursor.execute(sql,values)
+        conn.commit()
+        changed=cursor.rowcount>0
+        cursor.close()
+        conn.close()
+        return changed
+
+    def set_available(self,id,val,member_id):
+        pass
