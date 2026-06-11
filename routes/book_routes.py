@@ -58,6 +58,12 @@ def get_report_summary():
         "total available books": num_of_book_avail,
         "total borrowed books": num_of_book_non_avail
     }
+@app.get("/reports/books-by-genre")
+def count_books_genre():
+    result= book.count_by_genre()
+    if not result:
+        raise HTTPException(status_code=404,detail="Error any genre of book was not found")
+    return {"found":result}
 
 if __name__=="__main__":
     uvicorn.run("book_routes:app",reload=True)
