@@ -65,7 +65,10 @@ GET/reports/top-member
 
 #Run instructions#
 start the container
-enter to main.py
+then download the file req.txt
+and get active the .venv by .venv\Scripts\activate
+
+then enter to main.py
 and run it then enter to link and add the suffix '/docs'
 - and then a app will open there you can run the routs
 - 
