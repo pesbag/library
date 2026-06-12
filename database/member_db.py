@@ -10,7 +10,7 @@ class MemberDB:
     def create_member(self,data:dict):
         conn=get_connection()
         cursor=conn.cursor()
-        sql="INSERT INTO couriers (name,email,is_active,total_borrows) VALUES (%s,%s,%s,%s)"
+        sql="INSERT INTO members (name,email,is_active,total_borrows) VALUES (%s,%s,%s,%s)"
         values=(data["name"],data["email"],data["is_active"],data["total_borrows"])
         cursor.execute(sql,values)
         conn.commit()
@@ -33,16 +33,29 @@ class MemberDB:
     def get_member_by_id(self,id:int):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FORM members WHERE id=%s",(id,))
+        cursor.execute("SELECT * FROM members WHERE id=%s",(id,))
         member=cursor.fetchone()
         cursor.close()
         conn.close()
         return member
 
     def update_member(self,id:int,data:dict):
+        conn = get_connection()
+        cursor = conn.cursor()
+        set_part = [f"{key}=%s" for key in data.keys()]
+        set_clause = ",".join(set_part)
+        sql = f"UPDATE members SET {set_clause} WHERE id=%s"
+        values = list(data.values()) + [id]
+        cursor.execute(sql, values)
+        conn.commit()
+        changed = cursor.rowcount > 0
+        cursor.close()
+        conn.close()
+        return changed
+
+    def deactivate_member(self,id:int):
         pass
-    def deactivate_member(self,id):
-        pass
+
     def activate_member(self,id):
         pass
     def increment_borrows(self,id):

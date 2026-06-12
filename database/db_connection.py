@@ -1,16 +1,17 @@
 import mysql.connector
-conn=mysql.connector.connect(
-        host="localhost",
-        port=3306,
-        user="root",
-        password="secret",
-    )
-cursor=conn.cursor()
-cursor.execute("CREATE DATABASE IF NOT EXISTS library_db")
-print("data base created !")
-cursor.execute("USE library_db")
-cursor.close()
-conn.close()
+def setup():
+    conn=mysql.connector.connect(
+            host="localhost",
+            port=3306,
+            user="root",
+            password="secret",
+        )
+    cursor=conn.cursor()
+    cursor.execute("CREATE DATABASE IF NOT EXISTS library_db")
+    print("data base created !")
+    cursor.execute("USE library_db")
+    cursor.close()
+    conn.close()
 
 def get_connection():
     return mysql.connector.connect(

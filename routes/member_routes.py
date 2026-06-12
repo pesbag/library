@@ -9,6 +9,11 @@ class AddMember(BaseModel):
     email:str
     is_active:bool
     total_borrows:int
+class UpdateMember(BaseModel):
+    name: str|None=None
+    email: str|None=None
+    is_active: bool|None=None
+    total_borrows: int|None=None
 
 @router.post("/members")
 def add_member(data:AddMember):
@@ -22,10 +27,19 @@ def get_members():
     if not result:
         raise HTTPException(status_code=404,detail="Error the members tabel was empty, no member founds")
     return result
+
 @router.get("/members/{id}")
 def get_by_id(id:int):
     result=member.get_member_by_id(id)
+    # if not result:
+    #     raise HTTPException(status_code=404,detail=f"Error the member id {id} was not found")
+    return {f"The member by {id} is ":result}
+
+@router.put("/members/{id}")
+def update_fields(id:int, data:UpdateMember):
+    new_data=data.model_dump(exclude_unset=True)
+    result=member.update_member(id,new_data)
     if not result:
-        raise HTTPException(status_code=404,detail=f"Error the member id {id} was not found")
-    return result
+        return {"Error in update, number of items that change":result}
+    return{f"Successfully changed {result} items"}
 
