@@ -62,3 +62,11 @@ def update_borrow(id:int,member_id):
     if not result:
         raise HTTPException(status_code=404,detail=f"Error the id {id} was not found cannot update borrows")
     return result
+
+@router.get("/reports/summary")
+def count_active():
+    return member.count_active_members()
+
+@router.get("/reports/top-member")
+def top_member():
+    return member.get_top_member()

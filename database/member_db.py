@@ -84,6 +84,18 @@ class MemberDB:
         return total
 
     def count_active_members(self):
-        pass
-    def get_top_count(self):
-        pass
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM members WHERE is_active IS TRUE")
+        total_active=cursor.fetchone()[0]
+        cursor.close()
+        conn.close()
+        return total_active
+    def get_top_member(self):
+        conn=get_connection()
+        cursor=conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM members ORDER BY total_borrows DESC LIMIT 1 ")
+        max_b=cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return max_b
