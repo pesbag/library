@@ -30,9 +30,16 @@ class MemberDB:
         conn.close()
         return [name[0] for name in names]
 
-    def get_member_by_id(self,id):
-        pass
-    def update_member(self,id,data):
+    def get_member_by_id(self,id:int):
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FORM members WHERE id=%s",(id,))
+        member=cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return member
+
+    def update_member(self,id:int,data:dict):
         pass
     def deactivate_member(self,id):
         pass

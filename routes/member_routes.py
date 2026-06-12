@@ -22,3 +22,10 @@ def get_members():
     if not result:
         raise HTTPException(status_code=404,detail="Error the members tabel was empty, no member founds")
     return result
+@router.get("/members/{id}")
+def get_by_id(id:int):
+    result=member.get_member_by_id(id)
+    if not result:
+        raise HTTPException(status_code=404,detail=f"Error the member id {id} was not found")
+    return result
+
