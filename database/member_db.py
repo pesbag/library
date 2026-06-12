@@ -54,11 +54,25 @@ class MemberDB:
         return changed
 
     def deactivate_member(self,id:int):
-        pass
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE members SET is_active=False WHERE id=%s",(id,))
+        conn.commit()
+        changed=cursor.rowcount >0
+        cursor.close()
+        conn.close()
+        return changed
 
-    def activate_member(self,id):
-        pass
-    def increment_borrows(self,id):
+    def activate_member(self,id:int):
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE members SET is_active=True WHERE id=%s", (id,))
+        conn.commit()
+        changed = cursor.rowcount > 0
+        cursor.close()
+        conn.close()
+        return changed
+    def increment_borrows(self,id:int):
         pass
     def count_active_members(self):
         pass

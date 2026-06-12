@@ -43,3 +43,15 @@ def update_fields(id:int, data:UpdateMember):
         return {"Error in update, number of items that change":result}
     return{f"Successfully changed {result} items"}
 
+@router.put("/members/{id}/deactivate")
+def deactivate(id:int):
+    result=member.deactivate_member(id)
+    if not result:
+        raise HTTPException(status_code=404,detail=f"Error the member {id} was not found")
+    return result
+@router.put("/members/{id}/activate")
+def activate(id:int):
+    result = member.activate_member(id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"Error the member {id} was not found")
+    return result
