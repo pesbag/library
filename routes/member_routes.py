@@ -55,3 +55,10 @@ def activate(id:int):
     if not result:
         raise HTTPException(status_code=404, detail=f"Error the member {id} was not found")
     return result
+
+@router.put("/books/{id}/borrow/{member_id}")
+def update_borrow(id:int,member_id):
+    result=member.increment_borrows(id)
+    if not result:
+        raise HTTPException(status_code=404,detail=f"Error the id {id} was not found cannot update borrows")
+    return result

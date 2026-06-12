@@ -73,7 +73,16 @@ class MemberDB:
         conn.close()
         return changed
     def increment_borrows(self,id:int):
-        pass
+        conn=get_connection()
+        cursor=conn.cursor()
+        cursor.execute("SELECT total_borrows FROM members WHERE id=%s",(id,))
+        total=cursor.fetchone()[0]
+        cursor.execute(f"UPDATE members SET total_borrows={total+1} WHERE id={id}")
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return total
+
     def count_active_members(self):
         pass
     def get_top_count(self):
