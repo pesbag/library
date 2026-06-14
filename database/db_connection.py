@@ -22,7 +22,6 @@ def get_connection():
         database="library_db"
     )
 
-
 def create_tables():
     conn=get_connection()
     cursor=conn.cursor()

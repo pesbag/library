@@ -103,7 +103,7 @@ class MemberDB:
         conn=get_connection()
         cursor=conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM members ORDER BY total_borrows DESC LIMIT 1 ")
-        max_b=cursor.fetchall()
+        max_b=cursor.fetchone()
         cursor.close()
         conn.close()
-        return max_b
+        return {"member_id":max_b["id"],"borrowed":max_b["total_borrows"]}

@@ -56,33 +56,32 @@ def change_book_details(id:int,data:Update):
         raise HTTPException(status_code=404,detail=f"Error book id {id} for update was not found")
     return {"The update is success":result}
 
-
 @router.put("/books/{id}/borrow/{member_id}")
-def set_book_borrow(id:int,member_id:int):
-    member_total_borrows = member.increment_borrows(id, member_id)
-    if member_total_borrows>3:
-        raise HTTPException(status_code=400,detail="Member has reach maximum borrows")
-    if not member_total_borrows:
-        raise HTTPException(status_code=404, detail=f"Error the id {id} was not found cannot update borrows")
-    is_member_active=member.get_member_by_id(member_id)["is_active"]
-    if not is_member_active:
-        raise HTTPException(status_code=400,detail="Error inactive member cannot borrow a book")
-    result=book.set_available(id,"borrow",member_id)
-    if not result:
-        raise HTTPException(status_code=404,detail="Error book id was not found")
-    return {"Changed successfully":result}
-
+def set_book_borrow(id: int, member_id: int):
+    try:
+        get_member = member.get_member_by_id(member_id)
+        if not get_member:
+            raise HTTPException(status_code=404, detail="Member not found")
+        if not get_member["is_active"]:
+            raise HTTPException(status_code=400, detail="Inactive member cannot borrow a book")
+        if get_member["total_borrows"]>2:
+            raise HTTPException(status_code=400, detail="Member has reached maximum borrows")
+        result = book.set_available(id, "borrow", member_id)
+        if not result:
+            raise HTTPException(status_code=404, detail=f"Book id {id} was not found or is already borrowed")
+        member.increment_borrows(id, member_id)
+        return {"message": "Changed successfully"}
+    except HTTPException as http_ex:
+        raise http_ex
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 @router.put("/books/{id}/return/{member_id}")
 def set_book_return(id:int,member_id:int):
     result=book.set_available(id,"return",member_id)
     if not result:
         raise HTTPException(404,"Error book id or member id was not found")
+    return {"return book successfully":result}
 
-# @router.put("/books/{id}/borrow/{member_id}")
-# def update_borrow(id:int,member_id:int):
-#     result=member.increment_borrows(id,member_id)
-#     if not result:
-#         raise HTTPException(status_code=404,detail=f"Error the id {id} was not found cannot update borrows")
 if __name__=="__main__":
     uvicorn.run("book_routes:app",reload=True)

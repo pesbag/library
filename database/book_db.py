@@ -97,7 +97,7 @@ class BookDb:
 
     def count_by_genre(self):
         conn=get_connection()
-        cursor=conn.cursor(dictionary=True)
+        cursor=conn.cursor()
         cursor.execute("SELECT genre,COUNT(*) AS books_at_genre FROM books GROUP BY genre")
         total=cursor.fetchall()
         cursor.close()
