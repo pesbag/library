@@ -71,7 +71,7 @@ class BookDb:
         conn.close()
         return changed
 
-    def set_available(self,id,val,member_id):
+    def set_available(self,id:int,val,member_id:int):
         pass
     def count_borrowed_books(self):
         conn=get_connection()

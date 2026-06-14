@@ -55,7 +55,7 @@ Books:
 - PUT/books/{id}/borrow/{member_id} 
 - PUT/books/{id}/return/{member_id} 
 - 
-### Mebers:
+### Members:
 - POST/members 
 - GET/members 
 - GET/members/{id} 

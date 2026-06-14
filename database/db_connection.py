@@ -21,6 +21,8 @@ def get_connection():
         password="secret",
         database="library_db"
     )
+
+
 def create_tables():
     conn=get_connection()
     cursor=conn.cursor()

@@ -72,12 +72,13 @@ class MemberDB:
         cursor.close()
         conn.close()
         return changed
-    def increment_borrows(self,id:int):
+    def increment_borrows(self,id:int,member_id:int):
         conn=get_connection()
         cursor=conn.cursor()
         cursor.execute("SELECT total_borrows FROM members WHERE id=%s",(id,))
         total=cursor.fetchone()[0]
-        cursor.execute(f"UPDATE members SET total_borrows={total+1} WHERE id={id}")
+        cursor.execute("UPDATE members SET total_borrows=%s WHERE id=%s",(total+1,member_id))
+        cursor.execute("UPDATE books SET borrowed_by_id=%s WHERE id=%s",(member_id,id))
         conn.commit()
         cursor.close()
         conn.close()
@@ -91,6 +92,7 @@ class MemberDB:
         cursor.close()
         conn.close()
         return total_active
+
     def get_top_member(self):
         conn=get_connection()
         cursor=conn.cursor(dictionary=True)
