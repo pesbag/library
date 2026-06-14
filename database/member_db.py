@@ -1,4 +1,5 @@
-from database.db_connection import get_connection
+from database.db_connection import DbConnection
+connection=DbConnection()
 class MemberDB:
     def __init__(self,host,port,user,password,database):
         self.host=host
@@ -7,9 +8,24 @@ class MemberDB:
         self.password=password
         self.database=database
 
+    # def check_for_duplicate(self,data):
+    #     conn=connection.get_connection()
+    #     cursor=conn.cursor()
+    #     cursor.execute("SELECT email FROM  members")
+    #     emails = cursor.fetchall()
+    #     email_lst = [e[0] for e in emails]
+    #     if data["email"] in email_lst:
+    #         return None
+    #     cursor.close()
+    #     conn.close()
     def create_member(self,data:dict):
-        conn=get_connection()
+        conn=connection.get_connection()
         cursor=conn.cursor()
+        cursor.execute("SELECT id FROM members WHERE email=%s",(data["email"],))
+        if cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return None
         sql="INSERT INTO members (name,email,is_active) VALUES (%s,%s,%s)"
         values=(data["name"],data["email"],data["is_active"])
         cursor.execute(sql,values)
@@ -20,7 +36,7 @@ class MemberDB:
         return new_id
 
     def get_all_members(self):
-        conn=get_connection()
+        conn=connection.get_connection()
         cursor=conn.cursor()
         cursor.execute("SELECT name FROM members")
         names=cursor.fetchall()
@@ -31,7 +47,7 @@ class MemberDB:
         return [name[0] for name in names]
 
     def get_member_by_id(self,id:int):
-        conn = get_connection()
+        conn = connection.get_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM members WHERE id=%s",(id,))
         member=cursor.fetchone()
@@ -40,10 +56,16 @@ class MemberDB:
         return member
 
     def update_member(self,id:int,data:dict):
-        conn = get_connection()
+        conn = connection.get_connection()
         cursor = conn.cursor()
         set_part = [f"{key}=%s" for key in data.keys()]
         set_clause = ",".join(set_part)
+        if "email" in data.keys():
+            cursor.execute("SELECT id FROM members WHERE email=%s",(data["email"],))
+            if cursor.fetchone():
+                cursor.close()
+                conn.close()
+                return None
         sql = f"UPDATE members SET {set_clause} WHERE id=%s"
         values = list(data.values()) + [id]
         cursor.execute(sql, values)
@@ -54,7 +76,7 @@ class MemberDB:
         return changed
 
     def deactivate_member(self,id:int):
-        conn = get_connection()
+        conn = connection.get_connection()
         cursor = conn.cursor()
         cursor.execute("UPDATE members SET is_active=False WHERE id=%s",(id,))
         conn.commit()
@@ -64,7 +86,7 @@ class MemberDB:
         return changed
 
     def activate_member(self,id:int):
-        conn = get_connection()
+        conn = connection.get_connection()
         cursor = conn.cursor()
         cursor.execute("UPDATE members SET is_active=True WHERE id=%s", (id,))
         conn.commit()
@@ -74,7 +96,7 @@ class MemberDB:
         return changed
 
     def increment_borrows(self,id:int,member_id:int):
-        conn=get_connection()
+        conn=connection.get_connection()
         cursor=conn.cursor(dictionary=True)
         cursor.execute("SELECT total_borrows FROM members WHERE id=%s",(member_id,))
         row=cursor.fetchone()
@@ -91,7 +113,7 @@ class MemberDB:
         return total
 
     def count_active_members(self):
-        conn = get_connection()
+        conn = connection.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM members WHERE is_active IS TRUE")
         total_active=cursor.fetchone()[0]
@@ -100,7 +122,7 @@ class MemberDB:
         return total_active
 
     def get_top_member(self):
-        conn=get_connection()
+        conn=connection.get_connection()
         cursor=conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM members ORDER BY total_borrows DESC LIMIT 1 ")
         max_b=cursor.fetchone()

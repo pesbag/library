@@ -18,6 +18,8 @@ class UpdateMember(BaseModel):
 def add_member(data:AddMember):
     new_data=data.model_dump()
     result=member.create_member(new_data)
+    if not result:
+        raise HTTPException(status_code=409,detail="Error duplicate email found")
     return {"created member successfully, new id is": result}
 
 @router.get("/members")
@@ -39,7 +41,7 @@ def update_fields(id:int, data:UpdateMember):
     new_data=data.model_dump(exclude_unset=True)
     result=member.update_member(id,new_data)
     if not result:
-        return {"Error in update, number of items that change":result}
+        raise HTTPException(status_code=409, detail="Error duplicate email found or another problem in updating data")
     return{f"Successfully changed {result} items"}
 
 @router.put("/members/{id}/deactivate")
