@@ -8,13 +8,11 @@ class AddMember(BaseModel):
     name:str
     email:str
     is_active:bool
-    total_borrows:int
 
 class UpdateMember(BaseModel):
     name: str|None=None
     email: str|None=None
     is_active: bool|None=None
-    total_borrows: int|None=None
 
 @router.post("/members")
 def add_member(data:AddMember):
@@ -32,8 +30,8 @@ def get_members():
 @router.get("/members/{id}")
 def get_by_id(id:int):
     result=member.get_member_by_id(id)
-    # if not result:
-    #     raise HTTPException(status_code=404,detail=f"Error the member id {id} was not found")
+    if not result:
+        raise HTTPException(status_code=404,detail=f"Error the member id {id} was not found")
     return {f"The member by {id} is ":result}
 
 @router.put("/members/{id}")
@@ -57,17 +55,17 @@ def activate(id:int):
         raise HTTPException(status_code=404, detail=f"Error the member {id} was not found")
     return result
 
-@router.put("/books/{id}/borrow/{member_id}")
-def update_borrow(id:int,member_id:int):
-    result=member.increment_borrows(id,member_id)
-    if not result:
-        raise HTTPException(status_code=404,detail=f"Error the id {id} was not found cannot update borrows")
-    return result
+# @router.put("/books/{id}/borrow/{member_id}")
+# def update_borrow(id:int,member_id:int):
+#     result=member.increment_borrows(id,member_id)
+#     if not result:
+#         raise HTTPException(status_code=404,detail=f"Error the id {id} was not found cannot update borrows")
+#     return result
 
-@router.get("/reports/summary")
-def count_active():
-    return member.count_active_members()
+# @router.get("/reports/summary")
+# def count_active():
+#     return member.count_active_members()
 
-@router.get("/reports/top-member")
-def top_member():
-    return member.get_top_member()
+# @router.get("/reports/top-member")
+# def top_member():
+#     return member.get_top_member()

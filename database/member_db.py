@@ -10,8 +10,8 @@ class MemberDB:
     def create_member(self,data:dict):
         conn=get_connection()
         cursor=conn.cursor()
-        sql="INSERT INTO members (name,email,is_active,total_borrows) VALUES (%s,%s,%s,%s)"
-        values=(data["name"],data["email"],data["is_active"],data["total_borrows"])
+        sql="INSERT INTO members (name,email,is_active) VALUES (%s,%s,%s)"
+        values=(data["name"],data["email"],data["is_active"])
         cursor.execute(sql,values)
         conn.commit()
         new_id=cursor.lastrowid
@@ -72,6 +72,7 @@ class MemberDB:
         cursor.close()
         conn.close()
         return changed
+
     def increment_borrows(self,id:int,member_id:int):
         conn=get_connection()
         cursor=conn.cursor()

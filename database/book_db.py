@@ -1,4 +1,6 @@
 # import db_connection
+# from encodings.punycode import insertion_sort
+
 from database.db_connection import get_connection
 
 class BookDb:
@@ -71,8 +73,19 @@ class BookDb:
         conn.close()
         return changed
 
-    def set_available(self,id:int,val,member_id:int):
-        pass
+    def set_available(self,id:int,val:str,member_id:int):
+        conn=get_connection()
+        cursor=conn.cursor(dictionary=True)
+        if val=="return":
+            cursor.execute("UPDATE books SET is_available=True, borrowed_by_member_id=NULL WHERE id=%s",(id,))
+        elif val=="borrow":
+            cursor.execute("UPDATE books SET is_available=False, borrowed_by_member_id=%s WHERE id=%s",(member_id,id))
+        conn.commit()
+        changed=cursor.rowcount>0
+        cursor.close()
+        conn.close()
+        return changed
+
     def count_borrowed_books(self):
         conn=get_connection()
         cursor=conn.cursor()
@@ -90,3 +103,12 @@ class BookDb:
         cursor.close()
         conn.close()
         return total
+
+    def count_active_borrows_by_member(self,member_id):
+        conn=get_connection()
+        cursor=conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM books WHERE borrowed_by_member_id=%s",(member_id,))
+        total_books=cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return total_books[0] if total_books else None
