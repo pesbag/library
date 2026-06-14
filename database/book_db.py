@@ -1,10 +1,12 @@
 # import db_connection
 # from encodings.punycode import insertion_sort
-
+import logging
 from database.db_connection import DbConnection
 connection=DbConnection()
+logger=logging.getLogger(__name__)
 
 class BookDb:
+    logger.info("Enter to class BookDb")
     def __init__(self,host,port,user,password,database):
         self.host=host
         self.port=port
@@ -13,6 +15,7 @@ class BookDb:
         self.database=database
 
     def create_book(self,data:dict):
+        logger.info("Enter to create_book function in class BookDb")
         conn=connection.get_connection()
         cursor=conn.cursor()
         sql="INSERT INTO books (title,author,genre) VALUES (%s,%s,%s)"
@@ -25,6 +28,7 @@ class BookDb:
         return new_id
 
     def get_all_books(self):
+        logger.info("Enter to get_all_books function in class BookDb")
         conn=connection.get_connection()
         cursor=conn.cursor()
         cursor.execute("SELECT title FROM books")
@@ -34,6 +38,7 @@ class BookDb:
         return [name[0] for name in names] if names else None
 
     def get_book_by_id(self,id):
+        logger.info("Enter to get_book_by_id function in class BookDb")
         conn=connection.get_connection()
         cursor=conn.cursor()
         cursor.execute("SELECT * FROM books WHERE id=%s",(id,))
@@ -43,6 +48,7 @@ class BookDb:
         return book
 
     def count_total_books(self):
+        logger.info("Enter to count_total_books function in class BookDb")
         conn=connection.get_connection()
         cursor=conn.cursor(dictionary=True)
         cursor.execute("SELECT COUNT(*) AS total_books FROM books")
@@ -52,6 +58,7 @@ class BookDb:
         return total
 
     def count_available_books(self):
+        logger.info("Enter to count_available_books function in class BookDb")
         conn=connection.get_connection()
         cursor=conn.cursor(dictionary=True)
         cursor.execute("SELECT COUNT(*) AS total FROM books WHERE is_available=%s",(True,))
@@ -61,6 +68,7 @@ class BookDb:
         return total
 
     def update_book(self,id:int,data:dict):
+        logger.info("Enter to update_book function in class BookDb")
         conn=connection.get_connection()
         cursor=conn.cursor()
         set_part=[f"{key}=%s" for key in data.keys()]
@@ -75,6 +83,7 @@ class BookDb:
         return changed
 
     def set_available(self,id:int,val:str,member_id:int):
+        logger.info("Enter to set_available function in class BookDb")
         conn=connection.get_connection()
         cursor=conn.cursor(dictionary=True)
         if val=="return":
@@ -88,6 +97,7 @@ class BookDb:
         return changed
 
     def count_borrowed_books(self):
+        logger.info("Enter to count_borrowed_books function in class BookDb")
         conn=connection.get_connection()
         cursor=conn.cursor()
         cursor.execute("SELECT COUNT(*) AS total FROM books WHERE is_available=%s",(False,))
@@ -97,6 +107,7 @@ class BookDb:
         return total
 
     def count_by_genre(self):
+        logger.info("Enter to count_by_genre function in class BookDb")
         conn=connection.get_connection()
         cursor=conn.cursor()
         cursor.execute("SELECT genre,COUNT(*) AS books_at_genre FROM books GROUP BY genre")
@@ -106,6 +117,7 @@ class BookDb:
         return total
 
     def count_active_borrows_by_member(self,member_id):
+        logger.info("Enter to count_active_borrows_by_member function in class BookDb")
         conn=connection.get_connection()
         cursor=conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM books WHERE borrowed_by_member_id=%s",(member_id,))

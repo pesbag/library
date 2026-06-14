@@ -1,6 +1,8 @@
 import mysql.connector
-
+import logging
+logger=logging.getLogger(__name__)
 class DbConnection:
+    logger.info("Enter to class DbConnection")
     def __init__(self):
         host="localhost"
         port=3306
@@ -8,6 +10,7 @@ class DbConnection:
         password="secret"
 
     def setup(self):
+        logger.info("Enter to setup function in class DbConnection")
         conn=mysql.connector.connect(
                 host="localhost",
                 port=3306,
@@ -22,6 +25,7 @@ class DbConnection:
         conn.close()
 
     def get_connection(self):
+        logger.info("Enter to get_connection function in class DbConnection")
         return mysql.connector.connect(
             host="localhost",
             port=3306,
@@ -31,6 +35,7 @@ class DbConnection:
         )
 
     def create_tables(self):
+        logger.info("Enter to create_tables function in class DbConnection")
         conn=self.get_connection()
         cursor=conn.cursor()
         sql="""CREATE TABLE IF NOT EXISTS books(

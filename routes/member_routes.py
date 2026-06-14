@@ -1,6 +1,9 @@
 from fastapi import APIRouter,HTTPException
 from pydantic import BaseModel
 from database.member_db import MemberDB
+import logging
+logger=logging.getLogger(__name__)
+
 member=MemberDB("localhost",3306,"root","secret","library_db")
 router=APIRouter()
 
@@ -16,6 +19,7 @@ class UpdateMember(BaseModel):
 
 @router.post("/members")
 def add_member(data:AddMember):
+
     new_data=data.model_dump()
     result=member.create_member(new_data)
     if not result:

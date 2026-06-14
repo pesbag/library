@@ -1,24 +1,18 @@
 from database.db_connection import DbConnection
 connection=DbConnection()
+import logging
+logger=logging.getLogger(__name__)
 class MemberDB:
     def __init__(self,host,port,user,password,database):
+        logger.info("Enter to class MemberDB")
         self.host=host
         self.port=port
         self.user=user
         self.password=password
         self.database=database
 
-    # def check_for_duplicate(self,data):
-    #     conn=connection.get_connection()
-    #     cursor=conn.cursor()
-    #     cursor.execute("SELECT email FROM  members")
-    #     emails = cursor.fetchall()
-    #     email_lst = [e[0] for e in emails]
-    #     if data["email"] in email_lst:
-    #         return None
-    #     cursor.close()
-    #     conn.close()
     def create_member(self,data:dict):
+        logger.info("Enter to create_member function in class MemberDB")
         conn=connection.get_connection()
         cursor=conn.cursor()
         cursor.execute("SELECT id FROM members WHERE email=%s",(data["email"],))
@@ -36,6 +30,7 @@ class MemberDB:
         return new_id
 
     def get_all_members(self):
+        logger.info("Enter to get_all_members function in class MemberDB")
         conn=connection.get_connection()
         cursor=conn.cursor()
         cursor.execute("SELECT name FROM members")
@@ -47,6 +42,7 @@ class MemberDB:
         return [name[0] for name in names]
 
     def get_member_by_id(self,id:int):
+        logger.info("Enter to get_member_by_id function in class MemberDB")
         conn = connection.get_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM members WHERE id=%s",(id,))
@@ -56,6 +52,7 @@ class MemberDB:
         return member
 
     def update_member(self,id:int,data:dict):
+        logger.info("Enter to update_member function in class MemberDB")
         conn = connection.get_connection()
         cursor = conn.cursor()
         set_part = [f"{key}=%s" for key in data.keys()]
@@ -76,6 +73,7 @@ class MemberDB:
         return changed
 
     def deactivate_member(self,id:int):
+        logger.info("Enter to deactivate_member function in class MemberDB")
         conn = connection.get_connection()
         cursor = conn.cursor()
         cursor.execute("UPDATE members SET is_active=False WHERE id=%s",(id,))
@@ -86,6 +84,7 @@ class MemberDB:
         return changed
 
     def activate_member(self,id:int):
+        logger.info("Enter to activate_member function in class MemberDB")
         conn = connection.get_connection()
         cursor = conn.cursor()
         cursor.execute("UPDATE members SET is_active=True WHERE id=%s", (id,))
@@ -96,6 +95,7 @@ class MemberDB:
         return changed
 
     def increment_borrows(self,id:int,member_id:int):
+        logger.info("Enter to increment_borrows function in class MemberDB")
         conn=connection.get_connection()
         cursor=conn.cursor(dictionary=True)
         cursor.execute("SELECT total_borrows FROM members WHERE id=%s",(member_id,))
@@ -113,6 +113,7 @@ class MemberDB:
         return total
 
     def count_active_members(self):
+        logger.info("Enter to count_active_members function in class MemberDB")
         conn = connection.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM members WHERE is_active IS TRUE")
@@ -122,6 +123,7 @@ class MemberDB:
         return total_active
 
     def get_top_member(self):
+        logger.info("Enter to get_top_member function in class MemberDB")
         conn=connection.get_connection()
         cursor=conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM members ORDER BY total_borrows DESC LIMIT 1 ")
