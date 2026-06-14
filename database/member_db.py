@@ -75,11 +75,16 @@ class MemberDB:
 
     def increment_borrows(self,id:int,member_id:int):
         conn=get_connection()
-        cursor=conn.cursor()
-        cursor.execute("SELECT total_borrows FROM members WHERE id=%s",(id,))
-        total=cursor.fetchone()[0]
+        cursor=conn.cursor(dictionary=True)
+        cursor.execute("SELECT total_borrows FROM members WHERE id=%s",(member_id,))
+        row=cursor.fetchone()
+        if not row:
+            cursor.close()
+            conn.close()
+            return None
+        total=row["total_borrows"]
         cursor.execute("UPDATE members SET total_borrows=%s WHERE id=%s",(total+1,member_id))
-        cursor.execute("UPDATE books SET borrowed_by_id=%s WHERE id=%s",(member_id,id))
+        cursor.execute("UPDATE books SET borrowed_by_member_id=%s WHERE id=%s",(member_id,id))
         conn.commit()
         cursor.close()
         conn.close()

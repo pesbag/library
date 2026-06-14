@@ -56,33 +56,17 @@ def change_book_details(id:int,data:Update):
         raise HTTPException(status_code=404,detail=f"Error book id {id} for update was not found")
     return {"The update is success":result}
 
-# @router.get("/reports/summary")
-# def get_report_summary():
-#     num_of_book = book.count_total_books()
-#     num_of_book_avail = book.count_available_books()
-#     num_of_book_non_avail=book.count_borrowed_books()
-#     if not num_of_book:
-#         raise HTTPException(status_code=404, detail=f"Error the book with id {id} was not found")
-#     return {
-#         "total books": num_of_book,
-#         "total available books": num_of_book_avail,
-#         "total borrowed books": num_of_book_non_avail
-#     }
-# @router.get("/reports/books-by-genre")
-# def count_books_genre():
-#     result= book.count_by_genre()
-#     if not result:
-#         raise HTTPException(status_code=404,detail="Error any genre of book was not found")
-#     return {"found":result}
 
 @router.put("/books/{id}/borrow/{member_id}")
 def set_book_borrow(id:int,member_id:int):
-    member_result = member.increment_borrows(id, member_id)
-    if not member_result:
+    member_total_borrows = member.increment_borrows(id, member_id)
+    if member_total_borrows>3:
+        raise HTTPException(status_code=400,detail="Member has reach maximum borrows")
+    if not member_total_borrows:
         raise HTTPException(status_code=404, detail=f"Error the id {id} was not found cannot update borrows")
-    # is_member_active=member.get_member_by_id(id)["is_active"]
-    # if not is_member_active:
-    #     raise HTTPException(status_code=400,detail="Error inactive member cannot borrow a book")
+    is_member_active=member.get_member_by_id(member_id)["is_active"]
+    if not is_member_active:
+        raise HTTPException(status_code=400,detail="Error inactive member cannot borrow a book")
     result=book.set_available(id,"borrow",member_id)
     if not result:
         raise HTTPException(status_code=404,detail="Error book id was not found")
