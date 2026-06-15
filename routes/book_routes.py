@@ -87,13 +87,13 @@ def set_book_borrow(id: int, member_id: int):
         if not get_member["is_active"]:
             logger.error("Inactive member cannot borrow a book in set_book_borrow function in book_routes file")
             raise HTTPException(status_code=400, detail="Inactive member cannot borrow a book")
-        if get_member["total_borrows"]>2:
+        if book.count_active_borrows_by_member(member_id)>2:
             logger.error("Member has reached maximum borrows in set_book_borrow function in book_routes file")
             raise HTTPException(status_code=400, detail="Member has reached maximum borrows")
         result = book.set_available(id, "borrow", member_id)
         if not result:
             logger.error(f"Book id {id} was not found or is already borrowed in set_book_borrow function in book_routes file")
-            raise HTTPException(status_code=404, detail=f"Book id {id} was not found or is already borrowed")
+            raise HTTPException(status_code=400, detail=f"Book id {id} was not found or is already borrowed")
         member.increment_borrows(id, member_id)
         logger.debug("exit from rest PUT/books/{id}/borrow/{member_id}")
         return {"message": "Changed successfully"}
