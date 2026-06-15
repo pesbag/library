@@ -15,22 +15,24 @@ class MemberDB:
         logger.info("Enter to create_member function in class MemberDB")
         conn=connection.get_connection()
         cursor=conn.cursor()
-        logger.debug("check if the current email is already exists in the table")
-        cursor.execute("SELECT id FROM members WHERE email=%s",(data["email"],))
-        if cursor.fetchone():
+        try:
+            logger.debug("check if the current email is already exists in the table")
+            cursor.execute("SELECT id FROM members WHERE email=%s",(data["email"],))
+            if cursor.fetchone():
+                cursor.close()
+                conn.close()
+                return None
+            logger.info("insert the values the table")
+            sql="INSERT INTO members (name,email,is_active) VALUES (%s,%s,%s)"
+            values=(data["name"],data["email"],data["is_active"])
+            cursor.execute(sql,values)
+            conn.commit()
+            logger.debug("find the new id of the row that added")
+            new_id=cursor.lastrowid
+            return new_id
+        finally:
             cursor.close()
             conn.close()
-            return None
-        logger.info("insert the values the table")
-        sql="INSERT INTO members (name,email,is_active) VALUES (%s,%s,%s)"
-        values=(data["name"],data["email"],data["is_active"])
-        cursor.execute(sql,values)
-        conn.commit()
-        logger.debug("find the new id of the row that added")
-        new_id=cursor.lastrowid
-        cursor.close()
-        conn.close()
-        return new_id
 
     def get_all_members(self):
         logger.info("Enter to get_all_members function in class MemberDB")
@@ -61,25 +63,27 @@ class MemberDB:
         logger.info("Enter to update_member function in class MemberDB")
         conn = connection.get_connection()
         cursor = conn.cursor()
-        set_part = [f"{key}=%s" for key in data.keys()]
-        set_clause = ",".join(set_part)
-        if "email" in data.keys():
-            logger.debug("check if the current email is already exists in the table")
-            cursor.execute("SELECT id FROM members WHERE email=%s",(data["email"],))
-            if cursor.fetchone():
-                cursor.close()
-                conn.close()
-                return None
-            logger.info("update data of a specific member")
-        sql = f"UPDATE members SET {set_clause} WHERE id=%s"
-        values = list(data.values()) + [id]
-        cursor.execute(sql, values)
-        conn.commit()
-        logger.debug("check if any row affected from the update")
-        changed = cursor.rowcount > 0
-        cursor.close()
-        conn.close()
-        return changed
+        try:
+            set_part = [f"{key}=%s" for key in data.keys()]
+            set_clause = ",".join(set_part)
+            if "email" in data.keys():
+                logger.debug("check if the current email is already exists in the table")
+                cursor.execute("SELECT id FROM members WHERE email=%s",(data["email"],))
+                if cursor.fetchone():
+                    cursor.close()
+                    conn.close()
+                    return None
+                logger.info("update data of a specific member")
+            sql = f"UPDATE members SET {set_clause} WHERE id=%s"
+            values = list(data.values()) + [id]
+            cursor.execute(sql, values)
+            conn.commit()
+            logger.debug("check if any row affected from the update")
+            changed = cursor.rowcount > 0
+            return changed
+        finally:
+            cursor.close()
+            conn.close()
 
     def deactivate_member(self,id:int):
         logger.info("Enter to deactivate_member function in class MemberDB")
